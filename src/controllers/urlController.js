@@ -9,8 +9,6 @@ const urlShortner= async function(req,res){
         let{longUrl}=req.body;
         // if(!Object.keys().length == 0) return res.status(400).send({status:false,message:"Please enter input"});
         if(!longUrl) return res.status(400).send({status:false,message:"please enter the url"});
-        console.log(longUrl)
-
         if (!validUrl.isUri(baseUrl)) {
             return res.status(401).send({status:false,message:"Invalid base URL"})
         }
@@ -44,12 +42,21 @@ module.exports.urlShortner=urlShortner;
 
 const getUrl= async function(req,res){
     try{
-        const urlCode = req.params.code;
-        if(!code)  return res.status(400).send({status:false,message:"please enter the url"});
+        const urlCode = req.params.urlCode;
+        // if(!urlCode)  return res.status(400).send({status:false,message:"please enter the url"});
+        const isUrl= await urlModel.findOne({urlCode:urlCode})
+        console.log(isUrl)
+        if(!isUrl) return res.status(400).send({status:false,message:"url not found"});
+        if(isUrl) {
+            return res.redirect(isUrl.longUrl)
             
+        }else{
+            return res.status(404).send({status:false,message:"url not found"});
+        }
     }
     
     catch(error){
         return res.status(500).send({status:false,message:error.message})
     }
 }
+module.exports.getUrl=getUrl;
