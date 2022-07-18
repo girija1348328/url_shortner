@@ -15,9 +15,12 @@ const urlShortner= async function(req,res){
         const urlCode = shortid.generate()
         if (validUrl.isUri(longUrl)) {
             let url = await urlModel.findOne({longUrl:longUrl})
+            let obj = url.toObject();
+                delete obj._id;
+                delete obj.__v;
             
-            if (url){
-                return res.status(200).send({status:true,data:url})
+            if (obj){
+                return res.status(200).send({status:true,data:obj})
             }else{
                 const shortUrl = baseUrl + '/' + urlCode
                 url = new urlModel({
@@ -26,6 +29,7 @@ const urlShortner= async function(req,res){
                     urlCode
                 })
                 await url.save()
+                
                 return res.status(200).send({status:true,data:url})
             }
 
@@ -45,10 +49,9 @@ const getUrl= async function(req,res){
         const urlCode = req.params.urlCode;
         // if(!urlCode)  return res.status(400).send({status:false,message:"please enter the url"});
         const isUrl= await urlModel.findOne({urlCode:urlCode})
-        console.log(isUrl)
         if(!isUrl) return res.status(400).send({status:false,message:"url not found"});
         if(isUrl) {
-            return res.redirect(isUrl.longUrl)
+            return res.status(302).redirect(isUrl.longUrl)
             
         }else{
             return res.status(404).send({status:false,message:"url not found"});
