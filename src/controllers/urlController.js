@@ -48,7 +48,6 @@ const getUrl= async function(req,res){
     try{
         const urlCode = req.params.urlCode;
         const isUrl= await urlModel.findOne({urlCode:urlCode})
-        console.log(isUrl)
         if(!isUrl) return res.status(400).send({status:false,message:"url not found"});
         if(isUrl) {
             return res.status(302).redirect(isUrl.longUrl)
